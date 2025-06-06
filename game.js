@@ -35,9 +35,25 @@ let ball = {
     color: "#fff"
 };
 
-// Scores - Local state for tracking player scores
-let playerScore = 0;
-let aiScore = 0;
+// Scores - Local state for tracking player scores with localStorage persistence
+function loadScores() {
+    const savedPlayerScore = localStorage.getItem('pongPlayerScore');
+    const savedAiScore = localStorage.getItem('pongAiScore');
+    return {
+        playerScore: savedPlayerScore ? parseInt(savedPlayerScore) : 0,
+        aiScore: savedAiScore ? parseInt(savedAiScore) : 0
+    };
+}
+
+function saveScores() {
+    localStorage.setItem('pongPlayerScore', playerScore.toString());
+    localStorage.setItem('pongAiScore', aiScore.toString());
+}
+
+// Load scores from localStorage or default to 0
+const scores = loadScores();
+let playerScore = scores.playerScore;
+let aiScore = scores.aiScore;
 
 // Keyboard input state
 let keysPressed = {
@@ -96,10 +112,12 @@ function resetBall() {
     ball.dy = (Math.random() * 4 + 2) * (Math.random() > 0.5 ? 1 : -1);
 }
 
-// Reset game scores - resets local state to zero
+// Reset game scores - resets local state to zero and clears localStorage
 function resetScores() {
     playerScore = 0;
     aiScore = 0;
+    localStorage.removeItem('pongPlayerScore');
+    localStorage.removeItem('pongAiScore');
     resetBall(); // Also reset ball position when game is reset
 }
 
@@ -149,10 +167,12 @@ function update() {
     // Score tracking - updates local state when ball goes off screen
     if (ball.x - ball.radius < 0) {
         aiScore++;  // AI wins when ball goes off left side
+        saveScores(); // Save scores to localStorage
         resetBall();
     }
     if (ball.x + ball.radius > canvas.width) {
         playerScore++;  // Player wins when ball goes off right side
+        saveScores(); // Save scores to localStorage
         resetBall();
     }
 
