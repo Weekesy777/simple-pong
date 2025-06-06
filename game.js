@@ -39,6 +39,12 @@ let ball = {
 let playerScore = 0;
 let aiScore = 0;
 
+// Keyboard input state
+let keysPressed = {
+    ArrowUp: false,
+    ArrowDown: false
+};
+
 // Draw paddle
 function drawPaddle(paddle) {
     ctx.fillStyle = paddle.color;
@@ -134,6 +140,18 @@ function update() {
         resetBall();
     }
 
+    // Player paddle keyboard movement
+    const paddleSpeed = 7;
+    if (keysPressed.ArrowUp) {
+        playerPaddle.y -= paddleSpeed;
+    }
+    if (keysPressed.ArrowDown) {
+        playerPaddle.y += paddleSpeed;
+    }
+    // Prevent player paddle from going out of bounds
+    if (playerPaddle.y < 0) playerPaddle.y = 0;
+    if (playerPaddle.y + playerPaddle.height > canvas.height) playerPaddle.y = canvas.height - playerPaddle.height;
+
     // AI paddle movement (basic)
     let aiCenter = aiPaddle.y + aiPaddle.height / 2;
     if (aiCenter < ball.y - 35) {
@@ -171,6 +189,25 @@ canvas.addEventListener('mousemove', function (e) {
     // Prevent paddle from going out of bounds
     if (playerPaddle.y < 0) playerPaddle.y = 0;
     if (playerPaddle.y + playerPaddle.height > canvas.height) playerPaddle.y = canvas.height - playerPaddle.height;
+});
+
+// Keyboard controls for player paddle
+document.addEventListener('keydown', function (e) {
+    if (e.code === 'ArrowUp') {
+        keysPressed.ArrowUp = true;
+    }
+    if (e.code === 'ArrowDown') {
+        keysPressed.ArrowDown = true;
+    }
+});
+
+document.addEventListener('keyup', function (e) {
+    if (e.code === 'ArrowUp') {
+        keysPressed.ArrowUp = false;
+    }
+    if (e.code === 'ArrowDown') {
+        keysPressed.ArrowDown = false;
+    }
 });
 
 // Start game
