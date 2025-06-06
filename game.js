@@ -55,6 +55,29 @@ const scores = loadScores();
 let playerScore = scores.playerScore;
 let aiScore = scores.aiScore;
 
+// AI Difficulty system
+const difficultyLevels = [
+    { name: "Easy", speed: 3, deadZone: 50 },
+    { name: "Medium", speed: 5, deadZone: 35 },
+    { name: "Hard", speed: 7, deadZone: 20 }
+];
+
+// Load difficulty from localStorage or default to Medium (index 1)
+function loadDifficulty() {
+    const savedDifficulty = localStorage.getItem('pongAiDifficulty');
+    return savedDifficulty ? parseInt(savedDifficulty) : 1;
+}
+
+function saveDifficulty() {
+    localStorage.setItem('pongAiDifficulty', currentDifficulty.toString());
+}
+
+let currentDifficulty = loadDifficulty();
+
+function updateDifficultyDisplay() {
+    document.getElementById('difficultyDisplay').textContent = difficultyLevels[currentDifficulty].name;
+}
+
 // Keyboard input state
 let keysPressed = {
     ArrowUp: false,
@@ -188,12 +211,13 @@ function update() {
     if (playerPaddle.y < 0) playerPaddle.y = 0;
     if (playerPaddle.y + playerPaddle.height > canvas.height) playerPaddle.y = canvas.height - playerPaddle.height;
 
-    // AI paddle movement (basic)
+    // AI paddle movement (variable difficulty)
+    const aiSettings = difficultyLevels[currentDifficulty];
     let aiCenter = aiPaddle.y + aiPaddle.height / 2;
-    if (aiCenter < ball.y - 35) {
-        aiPaddle.y += 5;
-    } else if (aiCenter > ball.y + 35) {
-        aiPaddle.y -= 5;
+    if (aiCenter < ball.y - aiSettings.deadZone) {
+        aiPaddle.y += aiSettings.speed;
+    } else if (aiCenter > ball.y + aiSettings.deadZone) {
+        aiPaddle.y -= aiSettings.speed;
     }
     // Prevent AI paddle from going out of bounds
     if (aiPaddle.y < 0) aiPaddle.y = 0;
@@ -250,6 +274,26 @@ document.addEventListener('keyup', function (e) {
 document.getElementById('resetButton').addEventListener('click', function() {
     resetScores();
 });
+
+// Difficulty control buttons
+document.getElementById('decreaseDifficulty').addEventListener('click', function() {
+    if (currentDifficulty > 0) {
+        currentDifficulty--;
+        saveDifficulty();
+        updateDifficultyDisplay();
+    }
+});
+
+document.getElementById('increaseDifficulty').addEventListener('click', function() {
+    if (currentDifficulty < difficultyLevels.length - 1) {
+        currentDifficulty++;
+        saveDifficulty();
+        updateDifficultyDisplay();
+    }
+});
+
+// Initialize difficulty display
+updateDifficultyDisplay();
 
 // Start game
 gameLoop();

@@ -8,7 +8,15 @@
 <body>
     <h1>Simple Pong Game</h1>
     <canvas id="pongCanvas" width="800" height="500"></canvas>
-    <button id="resetButton">Reset Game</button>
+    <div id="controls">
+        <button id="resetButton">Reset Game</button>
+        <div id="difficulty-controls">
+            <button id="decreaseDifficulty">-</button>
+            <span id="difficultyDisplay">Medium</span>
+            <button id="increaseDifficulty">+</button>
+            <div id="difficultyLabel">AI Difficulty</div>
+        </div>
+    </div>
     <script src="game.js"></script>
 </body>
 </html>

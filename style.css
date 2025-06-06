@@ -38,3 +38,48 @@ h1 {
 #resetButton:hover {
     background: #2a8dd8;
 }
+
+#controls {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+}
+
+#difficulty-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#difficulty-controls button {
+    padding: 8px 15px;
+    font-size: 18px;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    background: #f39;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    min-width: 40px;
+}
+
+#difficulty-controls button:hover {
+    background: #d82a88;
+}
+
+#difficultyDisplay {
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 60px;
+    text-align: center;
+}
+
+#difficultyLabel {
+    font-size: 14px;
+    color: #ccc;
+    margin-top: 5px;
+}
