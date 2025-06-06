@@ -35,7 +35,7 @@ let ball = {
     color: "#fff"
 };
 
-// Scores
+// Scores - Local state for tracking player scores
 let playerScore = 0;
 let aiScore = 0;
 
@@ -71,12 +71,21 @@ function drawNet() {
     ctx.setLineDash([]);
 }
 
-// Draw scores
+// Draw scores with player labels
 function drawScores() {
     ctx.font = "32px Arial";
     ctx.fillStyle = "#fff";
+    
+    // Player 1 score (left side)
     ctx.fillText(playerScore, canvas.width / 4, 40);
+    ctx.font = "16px Arial";
+    ctx.fillText("Player 1", canvas.width / 4 - 30, 60);
+    
+    // Player 2 (AI) score (right side)
+    ctx.font = "32px Arial";
     ctx.fillText(aiScore, 3 * canvas.width / 4, 40);
+    ctx.font = "16px Arial";
+    ctx.fillText("Player 2 (AI)", 3 * canvas.width / 4 - 45, 60);
 }
 
 // Reset ball after score
@@ -85,6 +94,13 @@ function resetBall() {
     ball.y = canvas.height / 2;
     ball.dx = ball.speed * (Math.random() > 0.5 ? 1 : -1);
     ball.dy = (Math.random() * 4 + 2) * (Math.random() > 0.5 ? 1 : -1);
+}
+
+// Reset game scores - resets local state to zero
+function resetScores() {
+    playerScore = 0;
+    aiScore = 0;
+    resetBall(); // Also reset ball position when game is reset
 }
 
 // Collision detection
@@ -130,13 +146,13 @@ function update() {
         ball.dy = ball.speed * collidePoint;
     }
 
-    // Score
+    // Score tracking - updates local state when ball goes off screen
     if (ball.x - ball.radius < 0) {
-        aiScore++;
+        aiScore++;  // AI wins when ball goes off left side
         resetBall();
     }
     if (ball.x + ball.radius > canvas.width) {
-        playerScore++;
+        playerScore++;  // Player wins when ball goes off right side
         resetBall();
     }
 
@@ -208,6 +224,11 @@ document.addEventListener('keyup', function (e) {
     if (e.code === 'ArrowDown') {
         keysPressed.ArrowDown = false;
     }
+});
+
+// Reset button functionality
+document.getElementById('resetButton').addEventListener('click', function() {
+    resetScores();
 });
 
 // Start game
