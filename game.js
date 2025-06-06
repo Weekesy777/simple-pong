@@ -39,6 +39,25 @@ let ball = {
 let playerScore = 0;
 let aiScore = 0;
 
+// Load scores from localStorage if available (optional persistence)
+function loadScores() {
+    const savedPlayerScore = localStorage.getItem('pong_playerScore');
+    const savedAiScore = localStorage.getItem('pong_aiScore');
+    
+    if (savedPlayerScore !== null) {
+        playerScore = parseInt(savedPlayerScore, 10);
+    }
+    if (savedAiScore !== null) {
+        aiScore = parseInt(savedAiScore, 10);
+    }
+}
+
+// Save scores to localStorage (optional persistence)
+function saveScores() {
+    localStorage.setItem('pong_playerScore', playerScore.toString());
+    localStorage.setItem('pong_aiScore', aiScore.toString());
+}
+
 // Keyboard input state
 let keysPressed = {
     ArrowUp: false,
@@ -100,6 +119,7 @@ function resetBall() {
 function resetScores() {
     playerScore = 0;
     aiScore = 0;
+    saveScores(); // Clear localStorage as well
     resetBall(); // Also reset ball position when game is reset
 }
 
@@ -149,10 +169,12 @@ function update() {
     // Score tracking - updates local state when ball goes off screen
     if (ball.x - ball.radius < 0) {
         aiScore++;  // AI wins when ball goes off left side
+        saveScores(); // Save to localStorage for persistence
         resetBall();
     }
     if (ball.x + ball.radius > canvas.width) {
         playerScore++;  // Player wins when ball goes off right side
+        saveScores(); // Save to localStorage for persistence
         resetBall();
     }
 
@@ -230,6 +252,9 @@ document.addEventListener('keyup', function (e) {
 document.getElementById('resetButton').addEventListener('click', function() {
     resetScores();
 });
+
+// Load saved scores from localStorage on game start
+loadScores();
 
 // Start game
 gameLoop();
