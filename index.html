@@ -7,8 +7,20 @@
 </head>
 <body>
     <h1>Simple Pong Game</h1>
-    <canvas id="pongCanvas" width="800" height="500"></canvas>
-    <button id="resetButton">Reset Game</button>
+    <div class="game-container">
+        <canvas id="pongCanvas" width="800" height="500"></canvas>
+        <div class="game-info">
+            <button id="resetButton">Reset Game</button>
+            <div class="current-game">
+                <h3>Current Game (First to 10 wins)</h3>
+                <div id="currentScore">Player 1: 0 - Player 2 (AI): 0</div>
+            </div>
+            <div class="game-history">
+                <h3>Game History</h3>
+                <div id="historyList">No games played yet</div>
+            </div>
+        </div>
+    </div>
     <script src="game.js"></script>
 </body>
 </html>
