@@ -21,3 +21,20 @@ h1 {
     border-radius: 10px;
     box-shadow: 0 0 20px #000;
 }
+
+#resetButton {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-family: Arial, sans-serif;
+    background: #39f;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#resetButton:hover {
+    background: #2a8dd8;
+}
