@@ -111,3 +111,36 @@ h1 {
 #resetButton:hover {
     background: #2a8dd8;
 }
+
+/* Responsive design for smaller screens */
+@media (max-width: 1200px) {
+    .game-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .game-info {
+        width: 90%;
+        max-width: 800px;
+    }
+    
+    .current-game, .game-history {
+        display: inline-block;
+        width: calc(50% - 10px);
+        margin: 10px 5px;
+        vertical-align: top;
+    }
+}
+
+@media (max-width: 600px) {
+    .current-game, .game-history {
+        width: 100%;
+        margin: 10px 0;
+    }
+    
+    #pongCanvas {
+        width: 100%;
+        max-width: 600px;
+        height: auto;
+    }
+}
