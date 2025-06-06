@@ -35,19 +35,36 @@ let ball = {
     color: "#fff"
 };
 
-// Scores - Local state for tracking player scores with localStorage persistence
+// Game history management - stores completed games in localStorage
+function loadGameHistory() {
+    const savedHistory = localStorage.getItem('pongGameHistory');
+    return savedHistory ? JSON.parse(savedHistory) : [];
+}
+
+function saveGameToHistory(playerScore, aiScore) {
+    const history = loadGameHistory();
+    const gameResult = {
+        playerScore: playerScore,
+        aiScore: aiScore,
+        date: new Date().toLocaleString(),
+        winner: playerScore > aiScore ? 'Player 1' : 'Player 2 (AI)'
+    };
+    history.push(gameResult);
+    localStorage.setItem('pongGameHistory', JSON.stringify(history));
+}
+
+// Scores - Local state for tracking current game scores (no longer persistent)
 function loadScores() {
-    const savedPlayerScore = localStorage.getItem('pongPlayerScore');
-    const savedAiScore = localStorage.getItem('pongAiScore');
+    // Always start with fresh scores (0-0) when page loads
     return {
-        playerScore: savedPlayerScore ? parseInt(savedPlayerScore) : 0,
-        aiScore: savedAiScore ? parseInt(savedAiScore) : 0
+        playerScore: 0,
+        aiScore: 0
     };
 }
 
 function saveScores() {
-    localStorage.setItem('pongPlayerScore', playerScore.toString());
-    localStorage.setItem('pongAiScore', aiScore.toString());
+    // No longer save scores to localStorage - only save completed games to history
+    // This function kept for compatibility but doesn't persist current game state
 }
 
 // Load scores from localStorage or default to 0
@@ -112,12 +129,70 @@ function resetBall() {
     ball.dy = (Math.random() * 4 + 2) * (Math.random() > 0.5 ? 1 : -1);
 }
 
-// Reset game scores - resets local state to zero and clears localStorage
+// Update UI elements
+function updateCurrentScoreDisplay() {
+    const currentScoreElement = document.getElementById('currentScore');
+    currentScoreElement.textContent = `Player 1: ${playerScore} - Player 2 (AI): ${aiScore}`;
+}
+
+function updateGameHistoryDisplay() {
+    const historyElement = document.getElementById('historyList');
+    const history = loadGameHistory();
+    
+    if (history.length === 0) {
+        historyElement.innerHTML = '<div style="text-align: center; color: #aaa;">No games played yet</div>';
+        return;
+    }
+    
+    // Show most recent games first
+    const recentHistory = history.slice(-10).reverse();
+    
+    historyElement.innerHTML = recentHistory.map((game, index) => {
+        const isPlayerWin = game.winner === 'Player 1';
+        const winClass = isPlayerWin ? 'player-win' : 'ai-win';
+        
+        return `
+            <div class="history-game ${winClass}">
+                <div class="history-score">
+                    Player 1: ${game.playerScore} - Player 2 (AI): ${game.aiScore}
+                </div>
+                <div class="history-winner">Winner: ${game.winner}</div>
+                <div class="history-date">${game.date}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Game settings
+const WINNING_SCORE = 10;
+
+// Check if game is complete and handle completion
+function checkGameCompletion() {
+    if (playerScore >= WINNING_SCORE || aiScore >= WINNING_SCORE) {
+        // Save completed game to history
+        saveGameToHistory(playerScore, aiScore);
+        
+        // Update the history display
+        updateGameHistoryDisplay();
+        
+        // Start a new game
+        playerScore = 0;
+        aiScore = 0;
+        resetBall();
+        
+        // Update current score display
+        updateCurrentScoreDisplay();
+        
+        return true;
+    }
+    return false;
+}
+
+// Reset game scores - starts a new game
 function resetScores() {
     playerScore = 0;
     aiScore = 0;
-    localStorage.removeItem('pongPlayerScore');
-    localStorage.removeItem('pongAiScore');
+    updateCurrentScoreDisplay(); // Update UI
     resetBall(); // Also reset ball position when game is reset
 }
 
@@ -164,15 +239,17 @@ function update() {
         ball.dy = ball.speed * collidePoint;
     }
 
-    // Score tracking - updates local state when ball goes off screen
+    // Score tracking - updates current game state and checks for completion
     if (ball.x - ball.radius < 0) {
         aiScore++;  // AI wins when ball goes off left side
-        saveScores(); // Save scores to localStorage
+        updateCurrentScoreDisplay(); // Update UI immediately
+        checkGameCompletion(); // Check if game is complete and handle accordingly
         resetBall();
     }
     if (ball.x + ball.radius > canvas.width) {
         playerScore++;  // Player wins when ball goes off right side
-        saveScores(); // Save scores to localStorage
+        updateCurrentScoreDisplay(); // Update UI immediately
+        checkGameCompletion(); // Check if game is complete and handle accordingly
         resetBall();
     }
 
@@ -246,10 +323,23 @@ document.addEventListener('keyup', function (e) {
     }
 });
 
+// Initialize UI on page load
+function initializeGame() {
+    updateCurrentScoreDisplay();
+    updateGameHistoryDisplay();
+}
+
 // Reset button functionality
 document.getElementById('resetButton').addEventListener('click', function() {
     resetScores();
 });
+
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeGame);
+} else {
+    initializeGame();
+}
 
 // Start game
 gameLoop();
